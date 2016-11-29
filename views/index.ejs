@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style>
+
+  div.margin {
+    margin-right: 50px;
+    margin-left: 50px;
+  }
+
+  /*
+reference : https://docs.angularjs.org/guide/animations#!
+*/
+  .repeated-item.ng-enter, .repeated-item.ng-move {
+    transition: all 0.5s linear;
+    opacity: 0;
+  }
+
+  /*
+   The ng-enter-active and ng-move-active
+   are where the transition destination properties
+   are set so that the animation knows what to
+   animate.
+  */
+  .repeated-item.ng-enter.ng-enter-active,
+  .repeated-item.ng-move.ng-move-active {
+    opacity: 1;
+  }
+
+  /*
+    We're using CSS keyframe animations for when
+    the leave event is triggered for the element
+    that has the .repeated-item class
+  */
+  .repeated-item.ng-leave {
+    animation: 0.5s my_animation;
+  }
+
+  @keyframes my_animation {
+    from { opacity:1; }
+    to { opacity:0; }
+  }
+
+</style>
+
+<body>
+
+
+<h1 align="center">CSE5335 Project-2</h1>
+<br>
+<div class="margin">
+
+  <div ng-app="myApp" ng-controller="myCtrl">
+
+
+
+    <center><button  ng-click="clickButton()" class="btn btn-default">Click me!</button></center>
+    <br><br>
+    <div class="margin">
+
+      <table class="table table-striped">
+
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Zip Code</th>
+        </tr>
+        <tr ng-repeat="p in objList" class="repeated-item">
+          <td>{{ p.PID }}</td>
+          <td>{{ p.Pname }}</td>
+          <td>{{ p.Paddr }}</td>
+          <td>{{ p.City }}</td>
+          <td>{{ p.State }}</td>
+          <td>{{ p.ZipCode }}</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+    var app = angular.module('myApp', ['ngAnimate']);
+    app.controller('myCtrl', function($scope, $http, $interval) {
+
+        $scope.count=0;
+        $scope.objList=[];
+
+        $scope.clickButton = function()
+        {
+            timer = $interval(function()
+            {
+                if($scope.count < 100) {
+                    $scope.count++;
+                    if ($scope.count>20)
+                        $scope.objList.shift();
+                    $http.get("/show-hospital-details", {params: {"ID": $scope.count}})
+                        .then(function (response) {
+                            $scope.objList.push(response.data);
+
+                        });
+
+                }
+
+            },500);
+        };
+
+    });
+</script>
+
+</body>
+</html>
